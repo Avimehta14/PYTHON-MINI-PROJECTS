@@ -5,6 +5,7 @@ import os
 import webbrowser
 import wikipedia
 import random
+import smtplib
 
 print(" INITIALIZING JARVIS ")
 CREATOR= "JOHN"                                      # YOUR NAME CAN BE ENTERED HERE
@@ -14,6 +15,13 @@ engine = pyttsx3.init("sapi5")
 voices = engine.getProperty("voices")
 engine.setProperty("voice", voices[1].id)
 
+def sendEmail(to, content):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login('youremail@gmail.com', 'your-password')
+    server.sendmail('youremail@gmail.com', to, content)
+    server.close()
 
 def speak(text):
     engine.say(text)
@@ -51,6 +59,7 @@ def inputcommand():
 
 
     except Exception as e :
+        print(e)
         print("CAN YOU PLEASE SAY THAT AGAIN ...")
 
     return said    
@@ -58,7 +67,6 @@ def inputcommand():
 wish() 
 said = inputcommand()   
 
-#logic to access web
 
 if "open youtube" in said.lower() :
     url = "youtube.com"
@@ -71,6 +79,25 @@ elif "open google" in said.lower() :
 
     chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'       # FOR OPENING IN GOOGLE CHROME
     webbrowser.get(chrome_path).open(url)
+
+elif 'wikipedia' in said.lower():
+    speak('Searching Wikipedia...')
+    query = query.replace("wikipedia", "")
+    results = wikipedia.summary(query, sentences=2)
+    speak("According to Wikipedia")
+    print(results)
+    speak(results)               
+
+elif 'email to friend' in query:
+    try:
+        speak("What should I say?")
+        content = inputcommand()
+        to = "friendyourEmail@gmail.com"    
+        sendEmail(to, content)
+        speak("Email has been sent !")
+    except Exception as e:
+        print(e)
+        speak("Sorry my friend harry bhai. I am not able to send this email")
 
 elif "play music" in said.lower() :
     songs_dir = "C:\\Users\\avime\\Desktop\\SONGS"
@@ -144,7 +171,7 @@ elif " can you perform calculations" in said.lower()  or "calculations" in said.
         ans = res[0] / res[1]
         speak(ans)
 
-    elif " power " in per.lower() or " perform power " :
+    elif "power" in per.lower() or " perform power " :
         speak("ok , what are the numbers ")
         op = inputcommand()
         res= [ int(i)  for i in op.split() if i]
